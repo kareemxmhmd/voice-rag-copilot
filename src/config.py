@@ -6,24 +6,6 @@ from typing import Optional
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
-def resolve_api_key() -> Optional[str]:
-    """Dynamically resolves GEMINI_API_KEY from environment, .env, or Streamlit secrets."""
-    val = os.environ.get("GEMINI_API_KEY")
-    if val and val != "your_gemini_api_key_here":
-        return val
-    try:
-        import streamlit as st
-        if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
-            k = str(st.secrets["GEMINI_API_KEY"]).strip()
-            if k and k != "your_gemini_api_key_here":
-                os.environ["GEMINI_API_KEY"] = k
-                return k
-    except Exception:
-        pass
-    return None
-
-
 # Determine project base directory
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -47,11 +29,7 @@ class Settings(BaseSettings):
     reports_dir: Path = Field(default=PROJECT_ROOT / "evaluation" / "reports")
 
     # API Keys
-    gemini_api_key: Optional[str] = Field(default_factory=resolve_api_key, alias="GEMINI_API_KEY")
-
-    def get_api_key(self) -> Optional[str]:
-        """Returns the active Gemini API key from environment, settings, or secrets."""
-        return self.gemini_api_key or resolve_api_key()
+    gemini_api_key: Optional[str] = Field(default=None, alias="GEMINI_API_KEY")
 
     # LLM & Embedding Models
     gemini_model: str = Field(default="gemini-3.5-flash-lite", alias="GEMINI_MODEL")

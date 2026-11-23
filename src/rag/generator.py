@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional
 from google import genai
 from google.genai import types
 
-from src.config import resolve_api_key, settings
+from src.config import settings
 from src.rag.prompts import VOICE_SYSTEM_PROMPT, build_rag_prompt
 from src.rag.retriever import VoiceRetriever
 
@@ -45,7 +45,7 @@ class VoiceRAGGenerator:
     ):
         self.retriever = retriever or VoiceRetriever()
         self.model_name = model_name or settings.gemini_model
-        self.api_key = api_key or settings.gemini_api_key or resolve_api_key()
+        self.api_key = api_key or settings.gemini_api_key or os.environ.get("GEMINI_API_KEY")
 
         if not self.api_key or self.api_key == "your_gemini_api_key_here":
             raise ValueError(

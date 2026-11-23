@@ -15,8 +15,6 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import streamlit as st
-from src.config import resolve_api_key, settings
-from src.pipeline import get_pipeline
 
 st.set_page_config(
     page_title="NovaCart Voice RAG Copilot",
@@ -51,9 +49,26 @@ st.markdown(
 )
 
 
-# Verify GEMINI_API_KEY is available before initializing the AI pipeline
-active_key = settings.gemini_api_key or resolve_api_key() or os.environ.get("GEMINI_API_KEY")
-if not active_key or active_key == "your_gemini_api_key_here":
+# 1. Resolve GEMINI_API_KEY from environment or Streamlit secrets
+def get_active_gemini_key() -> str:
+    key = os.environ.get("GEMINI_API_KEY", "")
+    if key and key != "your_gemini_api_key_here":
+        return key
+    try:
+        if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
+            sec_key = str(st.secrets["GEMINI_API_KEY"]).strip()
+            if sec_key and sec_key != "your_gemini_api_key_here":
+                os.environ["GEMINI_API_KEY"] = sec_key
+                return sec_key
+    except Exception:
+        pass
+    return ""
+
+
+active_key = get_active_gemini_key()
+
+# 2. If key is missing, show instructions and prompt for key before loading pipeline
+if not active_key:
     st.error("🔑 **مفتاح Google Gemini API غير متوفر (GEMINI_API_KEY is Missing)**")
     st.warning("لتشغيل المساعد الصوتي على Streamlit Community Cloud، يرجى تزويد مفتاح الـ API:")
 
@@ -86,6 +101,10 @@ if not active_key or active_key == "your_gemini_api_key_here":
             "4. اضغط **Save** وسيعمل التطبيق بشكل دائم."
         )
     st.stop()
+
+# 3. Only import backend modules when GEMINI_API_KEY is guaranteed
+from src.config import settings
+from src.pipeline import get_pipeline
 
 
 @st.cache_resource(show_spinner="Initializing Voice RAG Pipeline & Knowledge Base...")

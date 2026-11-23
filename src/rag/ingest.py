@@ -13,7 +13,7 @@ import chromadb
 from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
 from google import genai
 
-from src.config import resolve_api_key, settings
+from src.config import settings
 
 
 @dataclass
@@ -170,7 +170,7 @@ class GeminiEmbeddingFunction(EmbeddingFunction):
         api_key: Optional[str] = None,
         model: Optional[str] = None,
     ):
-        self.api_key = api_key or settings.gemini_api_key or resolve_api_key()
+        self.api_key = api_key or settings.gemini_api_key or os.environ.get("GEMINI_API_KEY")
         if not self.api_key or self.api_key == "your_gemini_api_key_here":
             raise ValueError(
                 "GEMINI_API_KEY is missing or invalid. Please configure your key in .env or Streamlit secrets."

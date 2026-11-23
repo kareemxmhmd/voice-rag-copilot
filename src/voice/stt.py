@@ -10,7 +10,7 @@ from typing import Any, Dict, Optional, Union
 from google import genai
 from google.genai import types
 
-from src.config import resolve_api_key, settings
+from src.config import settings
 
 # Common audio extensions to MIME types
 MIME_MAP = {
@@ -38,7 +38,7 @@ class GeminiAudioSTT:
         api_key: Optional[str] = None,
         model_name: Optional[str] = None,
     ):
-        self.api_key = api_key or settings.gemini_api_key or resolve_api_key()
+        self.api_key = api_key or settings.gemini_api_key or os.environ.get("GEMINI_API_KEY")
         self.model_name = model_name or settings.gemini_model
 
         if not self.api_key or self.api_key == "your_gemini_api_key_here":
