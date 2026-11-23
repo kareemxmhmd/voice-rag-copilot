@@ -9,10 +9,6 @@ venv/
 vector_store/
 chroma.sqlite3
 
-# Data files (raw knowledge base & eval datasets)
-data/raw/
-data/eval/
-
 # Python Cache
 __pycache__/
 *.py[cod]
