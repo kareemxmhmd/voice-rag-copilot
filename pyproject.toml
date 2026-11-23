@@ -1,0 +1,16 @@
+[project]
+name = "voice-rag-copilot"
+version = "0.1.0"
+description = "Low-Latency Voice RAG Copilot for E-commerce & Subscription Operations"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic-settings>=2.2.0",
+    "python-dotenv>=1.0.0",
+    "chromadb>=0.5.0",
+    "google-genai>=1.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
