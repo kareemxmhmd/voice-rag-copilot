@@ -50,9 +50,19 @@ st.markdown(
 )
 
 
+@st.cache_resource(show_spinner="Initializing Voice RAG Pipeline & Knowledge Base...")
 def get_cached_pipeline():
-    """Cache the pipeline so it initializes only once across Streamlit reruns."""
-    return get_pipeline()
+    """Cache the pipeline so it initializes only once across Streamlit reruns.
+    Auto-ingests documents on first launch if vector store is uninitialized.
+    """
+    pipe = get_pipeline()
+    try:
+        if pipe.generator.retriever.collection.count() == 0:
+            from src.rag.ingest import ingest_knowledge_base
+            ingest_knowledge_base()
+    except Exception as exc:
+        print(f"[Warning] Auto-ingest check: {exc}")
+    return pipe
 
 
 pipeline = get_cached_pipeline()
