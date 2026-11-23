@@ -31,8 +31,8 @@ class Settings(BaseSettings):
     gemini_api_key: Optional[str] = Field(default=None, alias="GEMINI_API_KEY")
 
     # LLM & Embedding Models
-    gemini_model: str = Field(default="gemini-2.5-flash", alias="GEMINI_MODEL")
-    embedding_model: str = Field(default="models/text-embedding-004", alias="EMBEDDING_MODEL")
+    gemini_model: str = Field(default="gemini-3.5-flash-lite", alias="GEMINI_MODEL")
+    embedding_model: str = Field(default="gemini-embedding-001", alias="EMBEDDING_MODEL")
 
     # Vector Store & Retrieval Settings
     collection_name: str = Field(default="ecommerce_knowledge_base", alias="COLLECTION_NAME")
