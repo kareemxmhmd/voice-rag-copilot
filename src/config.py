@@ -1,9 +1,18 @@
 """Centralized configuration and settings for Voice RAG Copilot."""
 
+import os
 from pathlib import Path
 from typing import Optional
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Automatically load secrets if deployed on Streamlit Community Cloud
+try:
+    import streamlit as st
+    if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
+        os.environ.setdefault("GEMINI_API_KEY", str(st.secrets["GEMINI_API_KEY"]))
+except Exception:
+    pass
 
 # Determine project base directory
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
