@@ -45,7 +45,7 @@ class VoiceRAGGenerator:
     ):
         self.retriever = retriever or VoiceRetriever()
         self.model_name = model_name or settings.gemini_model
-        self.api_key = api_key or settings.gemini_api_key
+        self.api_key = api_key or settings.api_key or settings.gemini_api_key
 
         if not self.api_key or self.api_key == "your_gemini_api_key_here":
             raise ValueError(

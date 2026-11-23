@@ -170,10 +170,10 @@ class GeminiEmbeddingFunction(EmbeddingFunction):
         api_key: Optional[str] = None,
         model: Optional[str] = None,
     ):
-        self.api_key = api_key or settings.gemini_api_key
+        self.api_key = api_key or settings.api_key or settings.gemini_api_key
         if not self.api_key or self.api_key == "your_gemini_api_key_here":
             raise ValueError(
-                "GEMINI_API_KEY is missing or invalid. Please configure your key in .env"
+                "GEMINI_API_KEY is missing or invalid. Please configure your key in .env or Streamlit secrets."
             )
         target_model = model or settings.embedding_model
         if not target_model.startswith("models/"):

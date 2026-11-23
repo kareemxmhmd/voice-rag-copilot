@@ -38,12 +38,12 @@ class GeminiAudioSTT:
         api_key: Optional[str] = None,
         model_name: Optional[str] = None,
     ):
-        self.api_key = api_key or settings.gemini_api_key
+        self.api_key = api_key or settings.api_key or settings.gemini_api_key
         self.model_name = model_name or settings.gemini_model
 
         if not self.api_key or self.api_key == "your_gemini_api_key_here":
             raise ValueError(
-                "GEMINI_API_KEY is missing or invalid. Please configure your key in .env"
+                "GEMINI_API_KEY is missing or invalid. Please configure your key in .env or Streamlit secrets."
             )
 
         self.client = genai.Client(api_key=self.api_key)

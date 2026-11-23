@@ -5,6 +5,7 @@ microphone recording (st.audio_input), audio playback, latency metrics breakdown
 and knowledge base source inspection.
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -48,6 +49,43 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# Verify GEMINI_API_KEY is available before initializing the AI pipeline
+active_key = settings.api_key or os.environ.get("GEMINI_API_KEY")
+if not active_key or active_key == "your_gemini_api_key_here":
+    st.error("🔑 **مفتاح Google Gemini API غير متوفر (GEMINI_API_KEY is Missing)**")
+    st.warning("لتشغيل المساعد الصوتي على Streamlit Community Cloud، يرجى تزويد مفتاح الـ API:")
+
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.markdown("#### ⚡ الخيار السريع (لهذه الجلسة):")
+        temp_input = st.text_input(
+            "الصق مفتاح Gemini API هنا:",
+            type="password",
+            placeholder="AIzaSy...",
+            help="يمكنك الحصول على مفتاح مجاني من aistudio.google.com",
+        )
+        if st.button("تفعيل المفتاح فوراً 🚀", type="primary"):
+            if temp_input.strip():
+                os.environ["GEMINI_API_KEY"] = temp_input.strip()
+                st.success("تم تفعيل المفتاح بنجاح! جاري تشغيل التطبيق...")
+                st.rerun()
+            else:
+                st.error("يرجى إدخال مفتاح صالح.")
+
+    with col2:
+        st.markdown("#### 🔒 الخيار الدائم (Streamlit Secrets):")
+        st.info(
+            "1. اضغط أسفل يمين الصفحة على **Manage app**.\n"
+            "2. اختر القائمة **⋮** ثم **Settings** ثم **Secrets**.\n"
+            "3. أضف السطر التالي:\n"
+            "```toml\n"
+            'GEMINI_API_KEY = "AIzaSy..."\n'
+            "```\n"
+            "4. اضغط **Save** وسيعمل التطبيق بشكل دائم."
+        )
+    st.stop()
 
 
 @st.cache_resource(show_spinner="Initializing Voice RAG Pipeline & Knowledge Base...")
