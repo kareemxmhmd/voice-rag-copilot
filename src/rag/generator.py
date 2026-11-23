@@ -71,15 +71,37 @@ class VoiceRAGGenerator:
 
         # 2. Generation stage
         prompt = build_rag_prompt(query, context_texts)
-
-        response = self.client.models.generate_content(
-            model=self.model_name,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=VOICE_SYSTEM_PROMPT,
-                temperature=0.2,
-            ),
+        gen_config = types.GenerateContentConfig(
+            system_instruction=VOICE_SYSTEM_PROMPT,
+            temperature=0.2,
         )
+
+        response = None
+        models_to_try = [self.model_name]
+        if "gemini-3.8-flash" not in models_to_try:
+            models_to_try.append("gemini-3.8-flash")
+        if "gemini-3.5-flash-lite" not in models_to_try:
+            models_to_try.append("gemini-3.5-flash-lite")
+
+        last_error = None
+        for candidate_model in models_to_try:
+            for attempt in range(3):
+                try:
+                    response = self.client.models.generate_content(
+                        model=candidate_model,
+                        contents=prompt,
+                        config=gen_config,
+                    )
+                    break
+                except Exception as exc:
+                    last_error = exc
+                    time.sleep(1.0 * (attempt + 1))
+            if response is not None:
+                break
+
+        if response is None:
+            raise last_error
+
         t_llm = time.perf_counter()
         llm_ms = round((t_llm - t_retrieval) * 1000, 2)
         total_ms = round((t_llm - t0) * 1000, 2)
