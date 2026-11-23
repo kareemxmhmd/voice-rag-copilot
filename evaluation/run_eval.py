@@ -177,8 +177,19 @@ def run_evaluation() -> Dict[str, Any]:
 
         print(f"[{q_id:02d}/{len(dataset):02d}] ({lang} | {role}) {query[:55]}...")
 
-        # Run pipeline
-        res = pipeline.process_text(query, return_audio=True)
+        # Run pipeline with retry on 503 / network spike
+        res = None
+        for attempt in range(4):
+            try:
+                res = pipeline.process_text(query, return_audio=True)
+                break
+            except Exception as exc:
+                print(f"     [Retry {attempt+1}/4] Upstream transient error: {exc}. Retrying in 4s...")
+                time.sleep(4.0)
+
+        if res is None:
+            print(f"     [Error] Skipped Q{q_id} due to upstream availability.")
+            continue
 
         retrieval_ms = res["latencies"]["retrieval_ms"]
         llm_ms = res["latencies"]["llm_ms"]
