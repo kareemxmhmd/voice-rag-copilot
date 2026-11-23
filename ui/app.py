@@ -59,7 +59,6 @@ pipeline = get_cached_pipeline()
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.image("https://img.icons8.com/clouds/200/microphone.png", width=110)
     st.markdown("### System Controls")
 
     top_k = st.slider("Top-K Context Chunks", min_value=1, max_value=6, value=3)
@@ -115,33 +114,20 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-tab_voice, tab_text = st.tabs(["Voice Input (Microphone & File)", "Text Input"])
+tab_voice, tab_text = st.tabs(["Microphone Voice Input", "Text Input"])
 
 result_data = None
 
-# TAB 1: VOICE INPUT
+# TAB 1: VOICE INPUT (MICROPHONE ONLY)
 with tab_voice:
-    st.markdown("#### Speak your question:")
-    col_mic, col_file = st.columns([1, 1])
+    st.markdown("#### Speak your question directly:")
+    audio_mic = st.audio_input("Click the microphone to record your question:")
 
-    with col_mic:
-        st.markdown("**Option 1: Record from Microphone**")
-        audio_mic = st.audio_input("Click to record and ask:")
-
-    with col_file:
-        st.markdown("**Option 2: Upload Audio File**")
-        audio_file = st.file_uploader(
-            "Upload WAV, MP3, WebM, or OGG",
-            type=["wav", "mp3", "m4a", "ogg", "webm"],
-        )
-
-    active_audio = audio_mic or audio_file
-
-    if active_audio is not None:
-        if st.button("Process Voice Query", key="btn_run_voice", type="primary"):
-            with st.spinner("Transcribing audio and retrieving answers..."):
-                audio_bytes = active_audio.read()
-                mime = active_audio.type or "audio/wav"
+    if audio_mic is not None:
+        if st.button("🚀 Process Voice Query", key="btn_run_voice", type="primary"):
+            with st.spinner("🎧 Transcribing audio and retrieving answers..."):
+                audio_bytes = audio_mic.read()
+                mime = audio_mic.type or "audio/wav"
                 result_data = pipeline.process_voice(
                     audio_input=audio_bytes,
                     mime_type=mime,
