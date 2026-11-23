@@ -6,10 +6,12 @@ with Base64 and direct audio streaming support.
 
 import base64
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Optional
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
+from fastapi.staticfiles import StaticFiles
 
 from src.api.schemas import HealthResponse, LatencyMetrics, QueryResponse, SourceCitation, TextQueryRequest
 from src.config import settings
@@ -32,6 +34,11 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+# Mount HTML Voice Assistant Web UI
+html_path = Path(__file__).resolve().parent.parent.parent / "HTML"
+if html_path.exists():
+    app.mount("/assistant", StaticFiles(directory=str(html_path), html=True), name="assistant")
 
 # CORS middleware for cross-origin web/mobile access
 app.add_middleware(
