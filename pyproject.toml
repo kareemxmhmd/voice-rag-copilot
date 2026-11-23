@@ -10,8 +10,16 @@ dependencies = [
     "chromadb>=0.5.0",
     "google-genai>=1.0.0",
     "edge-tts>=7.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.30.0",
+    "python-multipart>=0.0.12",
+    "streamlit>=1.40.0",
 ]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
