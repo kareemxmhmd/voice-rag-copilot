@@ -21,6 +21,7 @@ htmlcov/
 # Evaluation outputs & temporary reports
 evaluation/reports/*.csv
 evaluation/reports/*.json
+evaluation/reports/*.md
 !evaluation/reports/.gitkeep
 
 # Audio cache & temporary files
