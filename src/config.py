@@ -47,12 +47,11 @@ class Settings(BaseSettings):
     reports_dir: Path = Field(default=PROJECT_ROOT / "evaluation" / "reports")
 
     # API Keys
-    gemini_api_key: Optional[str] = Field(default=None, alias="GEMINI_API_KEY")
+    gemini_api_key: Optional[str] = Field(default_factory=resolve_api_key, alias="GEMINI_API_KEY")
 
-    @property
-    def api_key(self) -> Optional[str]:
+    def get_api_key(self) -> Optional[str]:
         """Returns the active Gemini API key from environment, settings, or secrets."""
-        return resolve_api_key() or self.gemini_api_key
+        return self.gemini_api_key or resolve_api_key()
 
     # LLM & Embedding Models
     gemini_model: str = Field(default="gemini-3.5-flash-lite", alias="GEMINI_MODEL")

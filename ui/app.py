@@ -15,7 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import streamlit as st
-from src.config import settings
+from src.config import resolve_api_key, settings
 from src.pipeline import get_pipeline
 
 st.set_page_config(
@@ -52,7 +52,7 @@ st.markdown(
 
 
 # Verify GEMINI_API_KEY is available before initializing the AI pipeline
-active_key = settings.api_key or os.environ.get("GEMINI_API_KEY")
+active_key = settings.gemini_api_key or resolve_api_key() or os.environ.get("GEMINI_API_KEY")
 if not active_key or active_key == "your_gemini_api_key_here":
     st.error("🔑 **مفتاح Google Gemini API غير متوفر (GEMINI_API_KEY is Missing)**")
     st.warning("لتشغيل المساعد الصوتي على Streamlit Community Cloud، يرجى تزويد مفتاح الـ API:")
