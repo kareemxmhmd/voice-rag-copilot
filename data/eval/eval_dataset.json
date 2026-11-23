@@ -1,0 +1,146 @@
+[
+  {
+    "id": 1,
+    "user_role": "customer",
+    "language": "en",
+    "voice_query": "Hey, so I started the Pro free trial this Monday, November second, around three fifteen in the afternoon. When exactly do I have to cancel so I don't get charged?",
+    "ground_truth_answer": "Your trial converts on Monday, November 16th at 3:15 PM. You need to cancel at least 24 hours before that, so by Sunday, November 15th at 3:15 PM, or you'll be charged $180 for Pro.",
+    "source_files": ["01_subscription_plans.md", "02_cancellation_and_refunds.md"]
+  },
+  {
+    "id": 2,
+    "user_role": "customer",
+    "language": "en",
+    "voice_query": "I'm on Basic, paying monthly, and I want to switch to Pro. I'm like ten days into a thirty-day billing cycle. How much am I gonna get charged today?",
+    "ground_truth_answer": "You'd be charged $167.33 today. You get a $12.67 credit for the 20 unused Basic days, and that comes off the $180 Pro price. Your new 12-month Pro term starts today.",
+    "source_files": ["01_subscription_plans.md"]
+  },
+  {
+    "id": 3,
+    "user_role": "customer",
+    "language": "en",
+    "voice_query": "If I downgrade from Pro to Basic a few months in, do I get any money back for the rest of the year?",
+    "ground_truth_answer": "No. A downgrade takes effect at the end of your annual Pro term with no partial credit, and you keep your Pro perks until then. After that, Basic bills at $19 a month.",
+    "source_files": ["01_subscription_plans.md"]
+  },
+  {
+    "id": 4,
+    "user_role": "customer",
+    "language": "en",
+    "voice_query": "I signed up for Pro four days ago and I've only used the free Express shipping on one order. Can I get a refund?",
+    "ground_truth_answer": "Yes. You're inside the 7-day window and you've placed fewer than 2 qualifying Pro-perk orders, so you'd get a full refund of the $180 Pro charge.",
+    "source_files": ["02_cancellation_and_refunds.md", "01_subscription_plans.md"]
+  },
+  {
+    "id": 5,
+    "user_role": "customer",
+    "language": "en",
+    "voice_query": "I'm on the Basic plan and my cart total is exactly seventy-five dollars. Is shipping free? And would it be free if I was on Pro?",
+    "ground_truth_answer": "Not quite. Free Standard shipping needs a subtotal over $75, so exactly $75 pays $5.99 on Basic. On Pro, both Standard and Express shipping are free with no minimum.",
+    "source_files": ["03_shipping_and_returns.md", "01_subscription_plans.md"]
+  },
+  {
+    "id": 6,
+    "user_role": "internal_ops",
+    "language": "en",
+    "voice_query": "Customer on the Free plan wants to return an opened NovaSound Max, bought for two forty-nine, nothing wrong with it, still inside the 14 days. What refund do I quote them?",
+    "ground_truth_answer": "$204.66. That's $249 minus a 15% restocking fee of $37.35 and $6.99 return shipping, since it's an opened, non-defective, change-of-mind return on the Free plan.",
+    "source_files": ["03_shipping_and_returns.md", "05_product_catalog_faq.md"]
+  },
+  {
+    "id": 7,
+    "user_role": "customer",
+    "language": "en",
+    "voice_query": "My NovaWatch S2 just died on me, it's like a month old. I'm a Pro member. Can I return it or what?",
+    "ground_truth_answer": "A month in, you're past the 14-day return window, so file a warranty claim instead. The NovaWatch S2 has a 12-month warranty, and as a Pro member you get 6 extra months, so 18 total. Pro also gets advance replacement, shipped within 1 business day of approval.",
+    "source_files": ["05_product_catalog_faq.md", "03_shipping_and_returns.md", "01_subscription_plans.md"]
+  },
+  {
+    "id": 8,
+    "user_role": "customer",
+    "language": "en",
+    "voice_query": "How much is the Work Anywhere Bundle for a Pro member, and what's the regular price?",
+    "ground_truth_answer": "The bundle lists at $1,187. Standard members get 8% off, which is $1,092.04, and Pro members get 15% off, so $1,008.95.",
+    "source_files": ["05_product_catalog_faq.md", "01_subscription_plans.md"]
+  },
+  {
+    "id": 9,
+    "user_role": "customer",
+    "language": "en",
+    "voice_query": "Instead of canceling my Basic plan, can I just pause it for a couple months? How does that work?",
+    "ground_truth_answer": "Yes. You can pause Basic or Pro for 60 days, once per calendar year. You aren't billed while paused, perks are suspended, billing resumes after the 60 days, and you need to start the pause at least 24 hours before your next renewal.",
+    "source_files": ["02_cancellation_and_refunds.md"]
+  },
+  {
+    "id": 10,
+    "user_role": "customer",
+    "language": "en",
+    "voice_query": "I'm in Chicago and I'm a Pro member. If I want something same-day, what's the cutoff and what's it gonna cost me?",
+    "ground_truth_answer": "Chicago is a Same-Day metro. Order before 1:00 PM local time and it arrives by 9:00 PM that day. Same-Day costs Pro members $9.99.",
+    "source_files": ["03_shipping_and_returns.md", "01_subscription_plans.md"]
+  },
+  {
+    "id": 11,
+    "user_role": "internal_ops",
+    "language": "en",
+    "voice_query": "What was Basic churn in Q3, and what's the average LTV for Basic versus Pro?",
+    "ground_truth_answer": "Basic monthly churn was 6.4% with an average LTV of about $297. Pro churn was 2.1% with an average LTV of about $714.",
+    "source_files": ["04_q3_churn_analysis_report.md"]
+  },
+  {
+    "id": 12,
+    "user_role": "internal_ops",
+    "language": "en",
+    "voice_query": "In Q3, which worked better for Basic cancels, the 30 percent offer or the 60-day pause, and what does that 30 percent offer actually cost us per customer?",
+    "ground_truth_answer": "The pause did better: 71% of pausers were still active at day 90 versus 54% for the 30% offer, though the offer had slightly higher acceptance, 21% versus 18%. The offer costs $11.40 per customer: $5.70 off for two months, so $13.30 instead of $19.",
+    "source_files": ["04_q3_churn_analysis_report.md", "02_cancellation_and_refunds.md"]
+  },
+  {
+    "id": 13,
+    "user_role": "customer",
+    "language": "ar_en_mixed",
+    "voice_query": "لو أنا بدأت الـ Free Trial بتاع الـ Pro Plan ونسيت أعمل Cancel، هتحاسبوني إمتى وبكام؟",
+    "ground_truth_answer": "الـ Free Trial مدته 14 يوم، ولازم تعمل Cancel قبل ما يخلص بـ 24 ساعة على الأقل، يعني في اليوم الـ 13 في نفس الساعة اللي بدأت فيها. لو نسيت، هتتخصم 180 دولار للـ Pro Plan أوتوماتيك. بس لسه تقدر تطلب Refund كامل خلال 7 أيام من الخصم، بشرط تكون عملت أقل من طلبين استخدمت فيهم مميزات الـ Pro.",
+    "source_files": ["01_subscription_plans.md", "02_cancellation_and_refunds.md"]
+  },
+  {
+    "id": 14,
+    "user_role": "customer",
+    "language": "ar_en_mixed",
+    "voice_query": "أنا على Basic Plan وعاوز أعمل Upgrade للـ Pro Plan في نص الشهر، هتحاسبوني إزاي؟ يعني مثلاً أنا في اليوم العاشر من دورة 30 يوم.",
+    "ground_truth_answer": "الـ Upgrade بيتم فوراً وبتتحاسب Prorated. هتاخد Credit عن الـ 20 يوم اللي فاضلين من الـ Basic، وده 12.67 دولار، فهتدفع النهارده 167.33 دولار، وسنة الـ Pro بتبدأ من النهارده.",
+    "source_files": ["01_subscription_plans.md"]
+  },
+  {
+    "id": 15,
+    "user_role": "customer",
+    "language": "ar_en_mixed",
+    "voice_query": "اشتريت سماعة NovaBuds Pro بـ 149 دولار وفتحتها بس طلعت Defective. ينفع أعمل Return؟ وهتخصموا Restocking Fee؟",
+    "ground_truth_answer": "ينفع لو في خلال 14 يوم من التسليم. الـ Item الـ Defective مفيهوش Restocking Fee والـ Return Shipping ببلاش، فهتاخد الـ 149 دولار كاملة. وبعد الـ 14 يوم بيبقى Warranty Claim، والـ NovaBuds Pro عليها Warranty 12 شهر، أو 18 شهر لو إنت Pro Member.",
+    "source_files": ["03_shipping_and_returns.md", "05_product_catalog_faq.md"]
+  },
+  {
+    "id": 16,
+    "user_role": "internal_ops",
+    "language": "ar_en_mixed",
+    "voice_query": "الـ Churn Rate بتاع الـ Basic Plan في Q3 كان كام؟ وإيه أكبر Churn Driver؟",
+    "ground_truth_answer": "الـ Churn Rate الشهري للـ Basic كان 6.4% وللـ Pro كان 2.1%. أكبر Driver هو تأخير الشحن في الـ Regional Zones بنسبة 38% من الـ Exit Surveys، وبعده الـ Price-to-Value Gap بعد الـ Free Trial بنسبة 31%.",
+    "source_files": ["04_q3_churn_analysis_report.md"]
+  },
+  {
+    "id": 17,
+    "user_role": "internal_ops",
+    "language": "ar_en_mixed",
+    "voice_query": "عميل Pro Plan بيطلب Refund بعد 10 أيام من الاشتراك وعمل 3 طلبات بـ Free Express. أقوله إيه؟",
+    "ground_truth_answer": "للأسف مش هينفع Refund. الـ Full Refund بيبقى بس خلال 7 أيام من أول خصم وبشرط أقل من طلبين من الـ Pro-perk orders، وهو عدى الـ 7 أيام وعمل 3 طلبات. الـ Prorated Refund مش بيتاح غير لو حصل Express Guarantee breach أو NovaCart هي اللي أنهت الاشتراك. تقدر تعرض عليه Pause لمدة 60 يوم مرة في السنة، أو يكمل بمميزات الـ Pro لحد آخر الـ Term.",
+    "source_files": ["02_cancellation_and_refunds.md"]
+  },
+  {
+    "id": 18,
+    "user_role": "customer",
+    "language": "ar_en_mixed",
+    "voice_query": "الـ Enterprise Plan بيبدأ بكام، وفيه كام Seat، وهل الـ Setup Fee بيترد لو لغينا؟",
+    "ground_truth_answer": "الـ Enterprise بيبدأ من 499 دولار في الشهر لـ 10 Seats أو أكتر، والـ Seat الزيادة بـ 45 دولار في الشهر، وفيه Analytics Dashboard. والـ Setup Fee مبلغ 1,500 دولار مرة واحدة وده Non-refundable.",
+    "source_files": ["01_subscription_plans.md", "02_cancellation_and_refunds.md"]
+  }
+]
