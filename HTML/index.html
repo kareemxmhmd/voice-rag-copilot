@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaCart AI Voice Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: #060709;
+            color: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Subtle radial ambient glow */
+        .ambient-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(16, 37, 85, 0.22) 0%, rgba(6, 7, 9, 0) 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Top Header */
+        header {
+            width: 100%;
+            max-width: 900px;
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-dot {
+            width: 10px;
+            height: 10px;
+            background: #2563eb;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #3b82f6;
+        }
+
+        .brand-name {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #e2e8f0;
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(30, 58, 138, 0.35);
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(8px);
+        }
+
+        .status-indicator {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        /* Center Stage */
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+            flex: 1;
+            z-index: 10;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Waveform Canvas */
+        .wave-container {
+            width: 100%;
+            max-width: 650px;
+            height: 120px;
+            margin-bottom: 30px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas#waveform {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Voice Button */
+        .button-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        /* Dark blue button clearly distinguished from black background */
+        .voice-btn {
+            width: 108px;
+            height: 108px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #0e1a38, #0a1329);
+            border: 2px solid #1e3a8a;
+            color: #93c5fd;
+            cursor: pointer;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 35px rgba(23, 55, 135, 0.35), inset 0 0 15px rgba(30, 58, 138, 0.25);
+            position: relative;
+            z-index: 2;
+        }
+
+        .voice-btn:hover {
+            transform: scale(1.04);
+            border-color: #3b82f6;
+            box-shadow: 0 0 45px rgba(37, 99, 235, 0.5), inset 0 0 20px rgba(37, 99, 235, 0.3);
+            color: #bfdbfe;
+        }
+
+        .voice-btn:active {
+            transform: scale(0.97);
+        }
+
+        .voice-btn svg {
+            width: 38px;
+            height: 38px;
+            transition: transform 0.2s ease;
+        }
+
+        /* Button Pulse Ring during Recording */
+        .pulse-ring {
+            position: absolute;
+            width: 108px;
+            height: 108px;
+            border-radius: 50%;
+            border: 2px solid #3b82f6;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .is-recording .pulse-ring {
+            animation: pulse-out 1.8s infinite cubic-bezier(0.2, 0.6, 0.35, 1);
+        }
+
+        .is-recording .voice-btn {
+            background: linear-gradient(145deg, #162447, #0d1733);
+            border-color: #60a5fa;
+            color: #ffffff;
+            box-shadow: 0 0 50px rgba(59, 130, 246, 0.65);
+        }
+
+        @keyframes pulse-out {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1.7);
+                opacity: 0;
+            }
+        }
+
+        /* Status & Hints */
+        .status-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-bottom: 24px;
+            letter-spacing: -0.01em;
+            min-height: 28px;
+            transition: color 0.3s ease;
+        }
+
+        .status-text.recording {
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .status-text.speaking {
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        /* Subtitle / Answer Card */
+        .response-container {
+            width: 100%;
+            max-width: 650px;
+            min-height: 80px;
+            background: rgba(12, 19, 36, 0.6);
+            border: 1px solid rgba(30, 58, 138, 0.35);
+            border-radius: 16px;
+            padding: 20px 24px;
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all 0.4s ease;
+            text-align: left;
+        }
+
+        .response-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .query-label {
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .query-text {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .answer-label {
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #38bdf8;
+            margin-bottom: 4px;
+        }
+
+        .answer-text {
+            font-size: 1.05rem;
+            line-height: 1.55;
+            color: #f8fafc;
+            font-weight: 400;
+        }
+
+        .meta-row {
+            margin-top: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.78rem;
+            color: #64748b;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 10px;
+        }
+
+        .meta-sources {
+            display: flex;
+            gap: 6px;
+        }
+
+        .source-tag {
+            background: rgba(30, 58, 138, 0.3);
+            border: 1px solid rgba(30, 58, 138, 0.5);
+            padding: 2px 8px;
+            border-radius: 6px;
+            color: #93c5fd;
+        }
+
+        /* Footer */
+        footer {
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #475569;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <header>
+        <div class="brand">
+            <div class="brand-dot"></div>
+            <span class="brand-name">NovaCart Voice Copilot</span>
+        </div>
+        <div class="status-badge">
+            <div class="status-indicator"></div>
+            <span id="apiStatusText">FastAPI Connected</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Audio Visualizer Waveform -->
+        <div class="wave-container">
+            <canvas id="waveform"></canvas>
+        </div>
+
+        <!-- Center Recording Button -->
+        <div class="button-wrapper" id="buttonWrapper">
+            <div class="pulse-ring"></div>
+            <button class="voice-btn" id="recordBtn" title="Click to speak">
+                <!-- Microphone SVG Icon -->
+                <svg id="micIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="22"></line>
+                </svg>
+                <!-- Stop SVG Icon (Hidden by default) -->
+                <svg id="stopIcon" style="display: none;" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Action Hint -->
+        <div class="status-text" id="statusText">Tap to speak with AI Copilot</div>
+
+        <!-- Answer / Subtitles Container -->
+        <div class="response-container" id="responseContainer">
+            <div class="query-label">You Asked</div>
+            <div class="query-text" id="transcribedQuery">—</div>
+            <div class="answer-label">Copilot Response</div>
+            <div class="answer-text" id="aiAnswer">—</div>
+            <div class="meta-row">
+                <div class="meta-sources" id="sourcesList"></div>
+                <div id="latencyBadge">⚡ 0.0s</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Hidden Persistent Audio Player for AI Output -->
+    <audio id="aiAudioPlayer" preload="auto" style="display: none;"></audio>
+
+    <footer>
+        NovaCart Operations & Support • Bilingual Speech RAG Engine
+    </footer>
+
+    <script>
+        // API Base URL (defaults to localhost:8000)
+        const API_BASE = window.location.origin.includes('8000') 
+            ? window.location.origin 
+            : 'http://localhost:8000';
+
+        // DOM Elements
+        const recordBtn = document.getElementById('recordBtn');
+        const buttonWrapper = document.getElementById('buttonWrapper');
+        const micIcon = document.getElementById('micIcon');
+        const stopIcon = document.getElementById('stopIcon');
+        const statusText = document.getElementById('statusText');
+        const canvas = document.getElementById('waveform');
+        const ctx = canvas.getContext('2d');
+        const responseContainer = document.getElementById('responseContainer');
+        const transcribedQuery = document.getElementById('transcribedQuery');
+        const aiAnswer = document.getElementById('aiAnswer');
+        const sourcesList = document.getElementById('sourcesList');
+        const latencyBadge = document.getElementById('latencyBadge');
+        const apiStatusText = document.getElementById('apiStatusText');
+        const aiAudioPlayer = document.getElementById('aiAudioPlayer');
+
+        // State variables
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let isSpeaking = false;
+        let currentStream = null;
+
+        // Web Audio Nodes - Strictly separate Mic and Speaker graphs!
+        let audioCtx = null;
+        let micSourceNode = null;
+        let micAnalyser = null;
+        let micDataArray = null;
+
+        let playbackSourceNode = null;
+        let playbackAnalyser = null;
+        let playbackDataArray = null;
+
+        let animationFrameId = null;
+
+        // Resize Canvas properly for retina / high-DPI screens
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Check Backend Health
+        async function checkHealth() {
+            try {
+                const res = await fetch(`${API_BASE}/health`);
+                if (res.ok) {
+                    const data = await res.json();
+                    apiStatusText.textContent = `Online • ${data.vector_count} Docs`;
+                } else {
+                    apiStatusText.textContent = 'API Degraded';
+                }
+            } catch (e) {
+                apiStatusText.textContent = 'Backend Offline';
+            }
+        }
+        checkHealth();
+
+        // Initialize AudioContext & Separate Graph Pipelines
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            // 1. Mic Analyser (ONLY connected to mic input for visualizer, NEVER connected to audioCtx.destination!)
+            if (!micAnalyser) {
+                micAnalyser = audioCtx.createAnalyser();
+                micAnalyser.fftSize = 256;
+                micAnalyser.smoothingTimeConstant = 0.8;
+                micDataArray = new Uint8Array(micAnalyser.frequencyBinCount);
+            }
+
+            // 2. Playback Analyser (Connected to HTML5 <audio> -> Analyser -> Speakers)
+            if (!playbackSourceNode && aiAudioPlayer) {
+                try {
+                    playbackSourceNode = audioCtx.createMediaElementSource(aiAudioPlayer);
+                    playbackAnalyser = audioCtx.createAnalyser();
+                    playbackAnalyser.fftSize = 256;
+                    playbackAnalyser.smoothingTimeConstant = 0.85;
+                    playbackDataArray = new Uint8Array(playbackAnalyser.frequencyBinCount);
+
+                    // Route: Player -> Analyser -> Speakers
+                    playbackSourceNode.connect(playbackAnalyser);
+                    playbackAnalyser.connect(audioCtx.destination);
+                } catch (err) {
+                    console.warn('Audio element source setup:', err);
+                }
+            }
+        }
+
+        // Set up persistent audio player listeners
+        if (aiAudioPlayer) {
+            aiAudioPlayer.onended = () => {
+                isSpeaking = false;
+                statusText.textContent = 'Tap to speak again';
+                statusText.className = 'status-text';
+            };
+
+            aiAudioPlayer.onerror = (e) => {
+                console.error('Audio playback error:', e);
+                isSpeaking = false;
+                statusText.textContent = 'Audio playback error';
+                statusText.className = 'status-text';
+            };
+        }
+
+        // Waveform Drawing Loop
+        function drawWaveform() {
+            animationFrameId = requestAnimationFrame(drawWaveform);
+            const width = canvas.parentElement.clientWidth;
+            const height = canvas.parentElement.clientHeight;
+
+            ctx.clearRect(0, 0, width, height);
+            const centerY = height / 2;
+
+            if (isRecording && micAnalyser && micDataArray) {
+                // Visualise user's live voice (blue-cyan)
+                micAnalyser.getByteFrequencyData(micDataArray);
+
+                ctx.lineWidth = 2.8;
+                ctx.strokeStyle = '#38bdf8';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#0284c7';
+                ctx.beginPath();
+
+                const bins = micDataArray.length / 2;
+                const sliceWidth = width / bins;
+                let x = 0;
+
+                for (let i = 0; i < bins; i++) {
+                    const v = micDataArray[i] / 128.0;
+                    const y = centerY + (v - 1) * (height / 2.3);
+
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+
+                    x += sliceWidth;
+                }
+                ctx.stroke();
+
+            } else if (isSpeaking && playbackAnalyser && playbackDataArray) {
+                // Visualise AI speaking audio reply (royal blue)
+                playbackAnalyser.getByteFrequencyData(playbackDataArray);
+
+                ctx.lineWidth = 3.0;
+                ctx.strokeStyle = '#60a5fa';
+                ctx.shadowBlur = 18;
+                ctx.shadowColor = '#2563eb';
+                ctx.beginPath();
+
+                const bins = playbackDataArray.length / 2;
+                const sliceWidth = width / bins;
+                let x = 0;
+
+                for (let i = 0; i < bins; i++) {
+                    const v = playbackDataArray[i] / 128.0;
+                    const y = centerY + (v - 1) * (height / 2.2);
+
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+
+                    x += sliceWidth;
+                }
+                ctx.stroke();
+
+            } else {
+                // Idle gentle breathing baseline wave
+                const time = Date.now() * 0.003;
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.28)';
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = 'rgba(56, 189, 248, 0.2)';
+                ctx.beginPath();
+
+                for (let x = 0; x < width; x += 3) {
+                    const y = centerY + Math.sin(x * 0.015 + time) * 3;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+        }
+        drawWaveform();
+
+        // Start Recording
+        async function startRecording() {
+            initAudioContext();
+
+            // Stop any active playing audio before recording
+            if (aiAudioPlayer && !aiAudioPlayer.paused) {
+                aiAudioPlayer.pause();
+                aiAudioPlayer.currentTime = 0;
+            }
+            isSpeaking = false;
+
+            audioChunks = [];
+
+            try {
+                // Request microphone with explicit echo cancellation and noise suppression
+                currentStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+
+                // Connect microphone exclusively to micAnalyser (NEVER TO SPEAKERS / DESTINATION)
+                micSourceNode = audioCtx.createMediaStreamSource(currentStream);
+                micSourceNode.connect(micAnalyser);
+
+                // Determine supported recording mimeType
+                let options = {};
+                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                    options = { mimeType: 'audio/webm;codecs=opus' };
+                } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+                    options = { mimeType: 'audio/webm' };
+                } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                    options = { mimeType: 'audio/mp4' };
+                }
+
+                mediaRecorder = new MediaRecorder(currentStream, options);
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data && event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = async () => {
+                    // Disconnect mic audio nodes
+                    if (micSourceNode) {
+                        try { micSourceNode.disconnect(); } catch (e) {}
+                        micSourceNode = null;
+                    }
+                    // Stop media tracks
+                    if (currentStream) {
+                        currentStream.getTracks().forEach(track => track.stop());
+                        currentStream = null;
+                    }
+
+                    const blobType = mediaRecorder.mimeType || 'audio/webm';
+                    const audioBlob = new Blob(audioChunks, { type: blobType });
+                    await sendAudioToBackend(audioBlob);
+                };
+
+                mediaRecorder.start(100); // 100ms slice for responsive chunking
+                isRecording = true;
+                buttonWrapper.classList.add('is-recording');
+                micIcon.style.display = 'none';
+                stopIcon.style.display = 'block';
+                statusText.textContent = 'Listening... Tap button to stop & send';
+                statusText.className = 'status-text recording';
+
+            } catch (err) {
+                console.error('Microphone error:', err);
+                statusText.textContent = 'Microphone access denied or error';
+                isRecording = false;
+                buttonWrapper.classList.remove('is-recording');
+                micIcon.style.display = 'block';
+                stopIcon.style.display = 'none';
+            }
+        }
+
+        // Stop Recording
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            isRecording = false;
+            buttonWrapper.classList.remove('is-recording');
+            micIcon.style.display = 'block';
+            stopIcon.style.display = 'none';
+            statusText.textContent = 'Processing with AI Copilot...';
+            statusText.className = 'status-text';
+        }
+
+        // Toggle Record Button
+        recordBtn.addEventListener('click', () => {
+            if (isSpeaking && aiAudioPlayer) {
+                aiAudioPlayer.pause();
+                aiAudioPlayer.currentTime = 0;
+                isSpeaking = false;
+            }
+
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        });
+
+        // Send Audio Recording to FastAPI
+        async function sendAudioToBackend(audioBlob) {
+            const formData = new FormData();
+            const filename = audioBlob.type.includes('mp4') ? 'voice_query.mp4' : 'voice_query.webm';
+            formData.append('file', audioBlob, filename);
+            formData.append('return_audio', 'true');
+            formData.append('top_k', '3');
+
+            try {
+                const res = await fetch(`${API_BASE}/ask-voice`, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({ detail: res.statusText }));
+                    throw new Error(err.detail || 'Server error');
+                }
+
+                const data = await res.json();
+
+                // Display response card
+                transcribedQuery.textContent = data.query || '(No speech detected)';
+                aiAnswer.textContent = data.answer;
+
+                // Render sources tags
+                sourcesList.innerHTML = '';
+                if (data.sources && data.sources.length > 0) {
+                    data.sources.forEach(src => {
+                        const tag = document.createElement('span');
+                        tag.className = 'source-tag';
+                        tag.textContent = src;
+                        sourcesList.appendChild(tag);
+                    });
+                } else {
+                    sourcesList.textContent = 'General Policy';
+                }
+
+                latencyBadge.textContent = `⚡ ${(data.latencies.total_ms / 1000).toFixed(2)}s`;
+                responseContainer.classList.add('visible');
+
+                // Play Audio Response and visualize
+                if (data.audio_base64) {
+                    playAudioReply(data.audio_base64, data.audio_format);
+                } else {
+                    statusText.textContent = 'Response ready. Tap to speak again';
+                    statusText.className = 'status-text';
+                }
+
+            } catch (err) {
+                console.error(err);
+                statusText.textContent = 'Error: ' + err.message;
+                statusText.className = 'status-text';
+            }
+        }
+
+        // Play Copilot Audio Reply with Waveform Visualization
+        function playAudioReply(base64Data, format = 'audio/mp3') {
+            initAudioContext();
+
+            if (!aiAudioPlayer) return;
+
+            aiAudioPlayer.pause();
+            aiAudioPlayer.src = `data:${format};base64,${base64Data}`;
+            aiAudioPlayer.currentTime = 0;
+
+            isSpeaking = true;
+            statusText.textContent = 'Copilot is speaking...';
+            statusText.className = 'status-text speaking';
+
+            aiAudioPlayer.play().catch(err => {
+                console.error('Playback failed:', err);
+                isSpeaking = false;
+                statusText.textContent = 'Audio playback blocked by browser';
+                statusText.className = 'status-text';
+            });
+        }
+    </script>
+</body>
+</html>
