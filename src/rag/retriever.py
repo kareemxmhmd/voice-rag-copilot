@@ -27,10 +27,37 @@ class VoiceRetriever:
 
         self.client = chromadb.PersistentClient(path=str(self.persist_dir))
         self.embedding_fn = get_embedding_function()
-        self.collection = self.client.get_collection(
-            name=self.collection_name,
-            embedding_function=self.embedding_fn,
-        )
+
+        try:
+            self.collection = self.client.get_collection(
+                name=self.collection_name,
+                embedding_function=self.embedding_fn,
+            )
+        except Exception:
+            # Collection not found (e.g. initial run on fresh cloud deployment)
+            from src.rag.ingest import ingest_knowledge_base
+            ingest_knowledge_base(
+                target_raw_dir=settings.raw_data_dir,
+                target_persist_dir=self.persist_dir,
+                target_collection=self.collection_name,
+            )
+            self.collection = self.client.get_collection(
+                name=self.collection_name,
+                embedding_function=self.embedding_fn,
+            )
+
+        # If collection exists but is empty, populate it automatically
+        if self.collection.count() == 0:
+            from src.rag.ingest import ingest_knowledge_base
+            ingest_knowledge_base(
+                target_raw_dir=settings.raw_data_dir,
+                target_persist_dir=self.persist_dir,
+                target_collection=self.collection_name,
+            )
+            self.collection = self.client.get_collection(
+                name=self.collection_name,
+                embedding_function=self.embedding_fn,
+            )
 
     def retrieve(
         self,

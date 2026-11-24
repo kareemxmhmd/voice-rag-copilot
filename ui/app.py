@@ -90,7 +90,7 @@ if not active_key:
                 st.error("يرجى إدخال مفتاح صالح.")
 
     with col2:
-        st.markdown("#### 🔒 الخيار الدائم (Streamlit Secrets):")
+        st.markdown("#### الخيار الدائم (Streamlit Secrets):")
         st.info(
             "1. اضغط أسفل يمين الصفحة على **Manage app**.\n"
             "2. اختر القائمة **⋮** ثم **Settings** ثم **Secrets**.\n"
@@ -109,17 +109,8 @@ from src.pipeline import get_pipeline
 
 @st.cache_resource(show_spinner="Initializing Voice RAG Pipeline & Knowledge Base...")
 def get_cached_pipeline():
-    """Cache the pipeline so it initializes only once across Streamlit reruns.
-    Auto-ingests documents on first launch if vector store is uninitialized.
-    """
-    pipe = get_pipeline()
-    try:
-        if pipe.generator.retriever.collection.count() == 0:
-            from src.rag.ingest import ingest_knowledge_base
-            ingest_knowledge_base()
-    except Exception as exc:
-        print(f"[Warning] Auto-ingest check: {exc}")
-    return pipe
+    """Cache the pipeline so it initializes only once across Streamlit reruns."""
+    return get_pipeline()
 
 
 pipeline = get_cached_pipeline()
