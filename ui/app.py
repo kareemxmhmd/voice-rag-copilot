@@ -69,19 +69,19 @@ active_key = get_active_gemini_key()
 
 # 2. If key is missing, show instructions and prompt for key before loading pipeline
 if not active_key:
-    st.error("🔑 **مفتاح Google Gemini API غير متوفر (GEMINI_API_KEY is Missing)**")
+    st.error("**مفتاح Google Gemini API غير متوفر (GEMINI_API_KEY is Missing)**")
     st.warning("لتشغيل المساعد الصوتي على Streamlit Community Cloud، يرجى تزويد مفتاح الـ API:")
 
     col1, col2 = st.columns([1, 1])
     with col1:
-        st.markdown("#### ⚡ الخيار السريع (لهذه الجلسة):")
+        st.markdown("#### الخيار السريع (لهذه الجلسة):")
         temp_input = st.text_input(
             "الصق مفتاح Gemini API هنا:",
             type="password",
             placeholder="AIzaSy...",
             help="يمكنك الحصول على مفتاح مجاني من aistudio.google.com",
         )
-        if st.button("تفعيل المفتاح فوراً 🚀", type="primary"):
+        if st.button("تفعيل المفتاح فوراً ", type="primary"):
             if temp_input.strip():
                 os.environ["GEMINI_API_KEY"] = temp_input.strip()
                 st.success("تم تفعيل المفتاح بنجاح! جاري تشغيل التطبيق...")
@@ -182,8 +182,8 @@ with tab_voice:
     audio_mic = st.audio_input("Click the microphone to record your question:")
 
     if audio_mic is not None:
-        if st.button("🚀 Process Voice Query", key="btn_run_voice", type="primary"):
-            with st.spinner("🎧 Transcribing audio and retrieving answers..."):
+        if st.button("Process Voice Query", key="btn_run_voice", type="primary"):
+            with st.spinner("Transcribing audio and retrieving answers..."):
                 audio_bytes = audio_mic.read()
                 mime = audio_mic.type or "audio/wav"
                 result_data = pipeline.process_voice(
