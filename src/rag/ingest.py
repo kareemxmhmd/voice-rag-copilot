@@ -217,11 +217,12 @@ def ingest_knowledge_base(
     raw_dir: Optional[Path] = None,
     persist_dir: Optional[Path] = None,
     collection_name: Optional[str] = None,
+    **kwargs,
 ) -> int:
     """Ingests all markdown documents in raw_dir into ChromaDB using Gemini API."""
-    target_raw_dir = raw_dir or settings.raw_data_dir
-    target_persist_dir = persist_dir or settings.vector_store_dir
-    target_collection = collection_name or settings.collection_name
+    target_raw_dir = raw_dir or kwargs.get("target_raw_dir") or settings.raw_data_dir
+    target_persist_dir = persist_dir or kwargs.get("target_persist_dir") or settings.vector_store_dir
+    target_collection = collection_name or kwargs.get("target_collection") or settings.collection_name
 
     target_persist_dir.mkdir(parents=True, exist_ok=True)
 

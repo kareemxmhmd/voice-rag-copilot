@@ -37,9 +37,9 @@ class VoiceRetriever:
             # Collection not found (e.g. initial run on fresh cloud deployment)
             from src.rag.ingest import ingest_knowledge_base
             ingest_knowledge_base(
-                target_raw_dir=settings.raw_data_dir,
-                target_persist_dir=self.persist_dir,
-                target_collection=self.collection_name,
+                raw_dir=settings.raw_data_dir,
+                persist_dir=self.persist_dir,
+                collection_name=self.collection_name,
             )
             self.collection = self.client.get_collection(
                 name=self.collection_name,
@@ -50,9 +50,9 @@ class VoiceRetriever:
         if self.collection.count() == 0:
             from src.rag.ingest import ingest_knowledge_base
             ingest_knowledge_base(
-                target_raw_dir=settings.raw_data_dir,
-                target_persist_dir=self.persist_dir,
-                target_collection=self.collection_name,
+                raw_dir=settings.raw_data_dir,
+                persist_dir=self.persist_dir,
+                collection_name=self.collection_name,
             )
             self.collection = self.client.get_collection(
                 name=self.collection_name,
